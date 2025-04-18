@@ -36,9 +36,23 @@ class BootScene extends Phaser.Scene {
     WebFont.load({
       google: { families: ['Press Start 2P'] }, // Retro-style font
       active: () => {
-        // 2. Fonts loaded – proceed to Main Menu
+        // 2. Configure input settings
+        this.initializeInputSettings();
+        
+        // 3. Fonts loaded – proceed to Main Menu
         this.scene.start('MainMenuScene');
       }
     });
+  }
+  
+  initializeInputSettings() {
+    // Configure keyboard inputs
+    this.input.keyboard.createCursorKeys();
+    
+    // Set up mouse/touch interaction
+    this.input.setDefaultCursor('pointer');
+    
+    // Configure input for multi-touch/drag operations
+    this.input.setPollAlways();
   }
 }
