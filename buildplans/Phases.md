@@ -1,5 +1,5 @@
 ### Next 3 Steps:
-1. **UI Development** - Implement TurnIndicator and UnitPanel components
+1. **Setup Scene Improvements** - Complete unit placement UI, fix UI scaling/interactivity, and enforce scenario rules
 2. **Monster Dashboard** - Complete the MonsterDashboard UI for strength management
 3. **Special Abilities** - Implement 2-3 monster abilities (Flying, Fire Breathing, Web Spinning)
 
@@ -106,12 +106,14 @@ Here's a prioritized breakdown of build tasks for the game, ordered for logical 
 ---
 
 ### **Phase 6: Setup & Polish**
-19. **Setup Phase** ✓
+19. **Setup Phase** (⚒️ In Progress)
     - Implement monster creation UI (allocating Initial Strength Points) ✓
     - Create special abilities selection system ✓
     - Add unit purchase system for human player ✓
     - Implement map-edge selection for monster entry ✓
-    - Add initial unit placement for human player ✓
+    - Add initial unit placement for human player (⚒️ In Progress)
+    - Improve UI scaling and interactivity (⚒️ In Progress)
+    - Ensure scenario rules are properly enforced (⚒️ In Progress)
 
 20. **Victory Conditions** (⚒️ In Progress)
     - Implement win/loss checks (monster death, VP threshold) ✓
