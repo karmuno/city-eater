@@ -1,3 +1,7 @@
+import BootScene from './src/scenes/BootScene.js';
+import MainMenuScene from './src/scenes/MainMenuScene.js';
+import GameScene from './src/scenes/GameScene.js';
+
 const config = {
     type: Phaser.AUTO, // Auto-detect WebGL or Canvas
     parent: 'game-container', // ID of the HTML container

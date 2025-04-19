@@ -243,3 +243,5 @@ class MainMenuScene extends Phaser.Scene {
     }
   }
 }
+
+export default MainMenuScene;

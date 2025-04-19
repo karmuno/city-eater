@@ -56,3 +56,5 @@ class BootScene extends Phaser.Scene {
     this.input.setPollAlways();
   }
 }
+
+export default BootScene;
