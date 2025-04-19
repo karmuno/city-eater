@@ -1,0 +1,200 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "x": 325,
+      "y": 1650,
+      "adjacentNodes": [2, 11, 20],
+      "terrainType": "street"
+    },
+    {
+      "id": 2,
+      "x": 325,
+      "y": 1550,
+      "adjacentNodes": [1, 3, 11],
+      "terrainType": "street"
+    },
+    {
+      "id": 3,
+      "x": 325,
+      "y": 1450,
+      "adjacentNodes": [2, 4, 12],
+      "terrainType": "street"
+    },
+    {
+      "id": 4,
+      "x": 325,
+      "y": 1350,
+      "adjacentNodes": [3, 5, 13],
+      "terrainType": "street"
+    },
+    {
+      "id": 5,
+      "x": 325,
+      "y": 1250,
+      "adjacentNodes": [4, 6],
+      "terrainType": "street"
+    },
+    {
+      "id": 6,
+      "x": 325,
+      "y": 1150,
+      "adjacentNodes": [5, 7, 15],
+      "terrainType": "street"
+    },
+    {
+      "id": 7,
+      "x": 325,
+      "y": 1050,
+      "adjacentNodes": [6, 8, 16],
+      "terrainType": "forest"
+    },
+    {
+      "id": 8,
+      "x": 325,
+      "y": 950,
+      "adjacentNodes": [7, 9, 17],
+      "terrainType": "forest"
+    },
+    {
+      "id": 9,
+      "x": 325,
+      "y": 850,
+      "adjacentNodes": [8, 10, 18],
+      "terrainType": "mountain"
+    },
+    {
+      "id": 10,
+      "x": 325,
+      "y": 750,
+      "adjacentNodes": [9],
+      "terrainType": "mountain"
+    },
+    {
+      "id": 11,
+      "x": 425,
+      "y": 1600,
+      "adjacentNodes": [1, 2, 12, 19],
+      "terrainType": "street"
+    },
+    {
+      "id": 12,
+      "x": 425,
+      "y": 1450,
+      "adjacentNodes": [3, 11, 13],
+      "terrainType": "building"
+    },
+    {
+      "id": 13,
+      "x": 425,
+      "y": 1350,
+      "adjacentNodes": [4, 12, 14],
+      "terrainType": "building"
+    },
+    {
+      "id": 14,
+      "x": 425,
+      "y": 1250,
+      "adjacentNodes": [13, 15],
+      "terrainType": "building"
+    },
+    {
+      "id": 15,
+      "x": 425,
+      "y": 1150,
+      "adjacentNodes": [6, 14, 16],
+      "terrainType": "street"
+    },
+    {
+      "id": 16,
+      "x": 425,
+      "y": 1050,
+      "adjacentNodes": [7, 15, 17],
+      "terrainType": "forest"
+    },
+    {
+      "id": 17,
+      "x": 425,
+      "y": 950,
+      "adjacentNodes": [8, 16, 18],
+      "terrainType": "forest"
+    },
+    {
+      "id": 18,
+      "x": 425,
+      "y": 850,
+      "adjacentNodes": [9, 17],
+      "terrainType": "mountain"
+    },
+    {
+      "id": 19,
+      "x": 525,
+      "y": 1600,
+      "adjacentNodes": [11, 21, 28],
+      "terrainType": "street"
+    },
+    {
+      "id": 20,
+      "x": 375,
+      "y": 1700,
+      "adjacentNodes": [1, 21],
+      "terrainType": "street"
+    },
+    {
+      "id": 21,
+      "x": 525,
+      "y": 1700,
+      "adjacentNodes": [19, 20, 22],
+      "terrainType": "street"
+    },
+    {
+      "id": 22,
+      "x": 625,
+      "y": 1700,
+      "adjacentNodes": [21, 23],
+      "terrainType": "street"
+    },
+    {
+      "id": 23,
+      "x": 725,
+      "y": 1700,
+      "adjacentNodes": [22, 24],
+      "terrainType": "street"
+    },
+    {
+      "id": 24,
+      "x": 825,
+      "y": 1700,
+      "adjacentNodes": [23, 25],
+      "terrainType": "street"
+    },
+    {
+      "id": 25,
+      "x": 875,
+      "y": 1600,
+      "adjacentNodes": [24, 26, 35],
+      "terrainType": "street"
+    },
+    {
+      "id": 26,
+      "x": 775,
+      "y": 1600,
+      "adjacentNodes": [25, 27, 33],
+      "terrainType": "river"
+    },
+    {
+      "id": 27,
+      "x": 675,
+      "y": 1600,
+      "adjacentNodes": [26, 28, 32],
+      "terrainType": "street"
+    },
+    {
+      "id": 28,
+      "x": 575,
+      "y": 1600,
+      "adjacentNodes": [19, 27, 31],
+      "terrainType": "street"
+    }
+  ]
+}
