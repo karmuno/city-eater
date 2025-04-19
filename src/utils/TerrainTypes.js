@@ -1,91 +1,172 @@
 /**
  * TerrainTypes - Defines movement costs and rules for different terrain types
+ * Based on the rulebook's Terrain Effects Chart
  */
-
 const TerrainTypes = {
-  // Basic terrain types
-  default: {
-    name: 'Default',
-    movementCost: 1,
-    description: 'Standard terrain with no special properties'
-  },
-  
+  // Base terrain types from the rulebook
   street: {
     name: 'Street',
     movementCost: 1,
+    combatEffect: 'none',
+    destructStrength: 0,  // Not applicable
+    victoryPoints: 0,
     description: 'Urban roads with easy movement'
+  },
+  
+  park: {
+    name: 'Park',
+    movementCost: 2,
+    combatEffect: 'none',
+    destructStrength: 0,  // Not applicable
+    victoryPoints: 0,
+    description: 'Green areas that slow movement'
+  },
+  
+  lowBuilding: {
+    name: 'Low Building',
+    movementCost: 3,
+    combatEffect: 'defx2',  // Defender strength doubled
+    destructStrength: 2,
+    victoryPoints: 3,
+    description: 'Low structures that are impassable to monsters, armor, and artillery'
+  },
+  
+  highBuilding: {
+    name: 'High Building',
+    movementCost: 3,
+    combatEffect: 'defx2',  // Defender strength doubled
+    destructStrength: 4,
+    victoryPoints: 5,
+    description: 'Tall structures that are impassable to monsters, armor, and artillery'
+  },
+  
+  bridge: {
+    name: 'Bridge',
+    movementCost: 1,
+    combatEffect: 'none',
+    destructStrength: 2,
+    victoryPoints: 5,
+    description: 'Structures crossing water with normal movement'
+  },
+  
+  tunnel: {
+    name: 'Tunnel',
+    movementCost: 1,
+    combatEffect: 'defx2',  // Defender strength doubled
+    destructStrength: 0,  // Not applicable
+    victoryPoints: 0,
+    description: 'Underground passages'
   },
   
   river: {
     name: 'River',
-    movementCost: 2,
-    description: 'Water features that slow movement'
-  },
-  
-  building: {
-    name: 'Building',
-    movementCost: 3,
-    description: 'Urban structures that are difficult to navigate through'
-  },
-  
-  forest: {
-    name: 'Forest',
-    movementCost: 2,
-    description: 'Wooded areas with moderate movement penalty'
-  },
-  
-  mountain: {
-    name: 'Mountain',
-    movementCost: -1, // -1 indicates impassable
-    description: 'Impassable mountainous terrain'
-  },
-  
-  // Special terrain types
-  bridge: {
-    name: 'Bridge',
     movementCost: 1,
-    description: 'Structures crossing water with normal movement'
+    combatEffect: 'none',
+    destructStrength: 0,  // Not applicable
+    victoryPoints: 0,
+    description: 'Water that can only be entered by monsters, helicopters, and fireboats'
+  },
+  
+  rubble: {
+    name: 'Rubble',
+    movementCost: 2,
+    combatEffect: 'none',
+    destructStrength: 0,  // Not applicable
+    victoryPoints: 0,
+    description: 'Destroyed buildings'
+  },
+  
+  default: {
+    name: 'Unknown',
+    movementCost: 1,
+    combatEffect: 'none',
+    destructStrength: 0,
+    victoryPoints: 0,
+    description: 'Default terrain with no special properties'
   },
   
   /**
-   * Get movement cost for a specific terrain type
-   * @param {string} type - Terrain type name
-   * @param {object} unit - Optional unit object (for unit-specific effects)
-   * @returns {number} Movement cost (-1 for impassable)
+   * Check if terrain is passable for a given unit type
+   * @param {string} terrainType - The type of terrain
+   * @param {string} unitType - The type of unit (monster, infantry, armor, etc.)
+   * @returns {boolean} Whether the terrain is passable
    */
-  getMovementCost(type, unit = null) {
-    // If the terrain type doesn't exist, use default
-    if (!this[type]) {
-      return this.default.movementCost;
+  isPassable(terrainType, unitType) {
+    if (!this[terrainType]) {
+      terrainType = 'default';
     }
     
-    // Get the base movement cost
-    let cost = this[type].movementCost;
-    
-    // Apply unit-specific modifiers if unit is provided
-    if (unit) {
-      // Example: Flying units ignore terrain costs
-      if (unit.abilities && unit.abilities.includes('flying')) {
-        return 1;
-      }
-      
-      // Example: Aquatic units can move through water easily
-      if (type === 'river' && unit.abilities && unit.abilities.includes('aquatic')) {
-        return 1;
-      }
+    // Impassable terrain based on unit type
+    switch(unitType) {
+      case 'monster':
+        // Monsters can't enter buildings unless they have flying ability
+        return !['lowBuilding', 'highBuilding'].includes(terrainType);
+        
+      case 'armor':
+      case 'artillery':
+        // Armor and artillery can't enter buildings
+        return !['lowBuilding', 'highBuilding'].includes(terrainType);
+        
+      case 'infantry':
+      case 'police':
+        // Infantry and police can enter any terrain
+        return true;
+        
+      case 'helicopter':
+        // Helicopters can enter any terrain
+        return true;
+        
+      case 'fireboat':
+        // Fireboats can only enter river boxes
+        return terrainType === 'river';
+        
+      default:
+        // By default, assume passable
+        return true;
     }
-    
-    return cost;
   },
   
   /**
-   * Check if terrain is passable for a unit
-   * @param {string} type - Terrain type name
-   * @param {object} unit - Optional unit object
-   * @returns {boolean} True if passable
+   * Get movement cost for a specific terrain type and unit
+   * @param {string} terrainType - Terrain type name
+   * @param {string} unitType - Type of unit
+   * @returns {number} Movement cost (or -1 if impassable)
    */
-  isPassable(type, unit = null) {
-    return this.getMovementCost(type, unit) > 0;
+  getMovementCost(terrainType, unitType) {
+    // If terrain is impassable for this unit, return -1
+    if (!this.isPassable(terrainType, unitType)) {
+      return -1;
+    }
+    
+    // Use default terrain if type doesn't exist
+    if (!this[terrainType]) {
+      terrainType = 'default';
+    }
+    
+    // Special movement costs based on unit type
+    switch(unitType) {
+      case 'helicopter':
+        // Helicopters pay 1 MP for any terrain
+        return 1;
+        
+      case 'monster':
+        if (terrainType === 'river') {
+          return 2; // Monsters move slower in water
+        }
+        break;
+    }
+    
+    // Return standard movement cost for terrain
+    return this[terrainType].movementCost;
+  },
+  
+  /**
+   * Get all terrain information
+   * @param {string} terrainType - Terrain type name
+   * @returns {object} Terrain information or default if not found
+   */
+  getInfo(terrainType) {
+    return this[terrainType] || this.default;
   }
 };
 
