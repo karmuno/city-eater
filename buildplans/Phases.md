@@ -1,4 +1,9 @@
-Here’s a prioritized breakdown of build tasks for the game, ordered for logical progression:
+### Next 3 Steps:
+1. **Implement Monster Class** - Create Monster.js with customizable strengths and basic movement mechanics
+2. **Build Game State Management** - Develop GameState.js to track unit positions, health, and game conditions
+3. **Implement Turn Manager** - Create turn alternation between monster and human players
+
+Here's a prioritized breakdown of build tasks for the game, ordered for logical progression:
 
 ---
 
@@ -33,19 +38,31 @@ Here’s a prioritized breakdown of build tasks for the game, ordered for logica
    - Build `Monster.js` with customizable strengths  
    - Implement special ability placeholder system  
 
+7. **Game State Management**
+   - Create `GameState.js` to track game state
+   - Implement unit tracking and position management
+   - Add state serialization for save/load capability
+   - Build event system for state changes
+
 ---
 
 ### **Phase 3: Core Mechanics**  
-7. **Turn System**  
+8. **Data Loading**
+   - Load combat tables from JSON
+   - Load unit stats and special abilities
+   - Create data validation and error handling
+
+9. **Turn System**  
    - Alternate between Monster/Human turns  
    - Track movement points and actions per turn  
+   - Implement action limits (3 destruction attempts)
 
-8. **Movement System**  
+10. **Movement System**  
    - Highlight valid movement tiles  
-   - Implement pathfinding with `easystar.js`  
+   - Implement pathfinding with terrain costs
    - Add terrain restrictions (e.g., helicopters ignore rivers)  
 
-9. **Combat System**  
+11. **Combat System**  
    - Calculate odds ratios (attacker/defender strength)  
    - Integrate virtual die roll (1–6)  
    - Apply results from `combat-tables.json`  
@@ -53,50 +70,55 @@ Here’s a prioritized breakdown of build tasks for the game, ordered for logica
 ---
 
 ### **Phase 4: Advanced Systems**  
-10. **Line of Sight (LOS)**  
+12. **Line of Sight (LOS)**  
     - Add raycasting for blocked paths (high/low buildings)  
     - Visualize LOS during attack selection  
 
-11. **Fire Mechanics**  
+13. **Fire Mechanics**  
     - Flame marker placement/rubble conversion  
     - Wind-driven fire spread logic  
     - Firemen/fireboat extinguishing actions  
 
-12. **Special Abilities**  
+14. **Special Abilities**  
     - Implement 2–3 abilities first (e.g., Flying, Fire Breathing)  
     - Add cooldowns/UI indicators  
+
+15. **Testing Framework**
+    - Implement unit tests for critical systems
+    - Create test scenarios for pathfinding
+    - Add tests for combat resolution edge cases
 
 ---
 
 ### **Phase 5: UI/UX**  
-13. **Unit Panel**  
+16. **Unit Panel**  
     - Display selected unit stats/actions  
     - Add attack range visualization  
 
-14. **Monster Dashboard**  
+17. **Monster Dashboard**  
     - Show strength allocations (attack/defense/movement)  
     - Track Victory Points  
 
-15. **Turn Indicator**  
+18. **Turn Indicator**  
     - Visual toggle between Monster/Human phases  
     - Action counter (e.g., "Destruction attempts remaining: 3")  
 
 ---
 
 ### **Phase 6: Polish**  
-16. **Victory Conditions**  
+19. **Victory Conditions**  
     - Implement win/loss checks (monster death, VP threshold)  
     - Build `VictoryScene` with replay/exit options  
 
-17. **Animations**  
+20. **Animations**  
     - Add combat effects (flames, explosions)  
     - Unit movement tweening  
 
-18. **Sound Integration**  
+21. **Sound Integration**  
     - Add SFX for combat, fire, monster actions  
     - Background music toggle  
 
-19. **Scenario System**  
+22. **Scenario System**  
     - Load `scenarios.json` (Initial Strength Points, rulesets)  
     - Add difficulty selector to Main Menu  
 
@@ -105,6 +127,4 @@ Here’s a prioritized breakdown of build tasks for the game, ordered for logica
 ### **Suggested Workflow**  
 1. **Vertical Slice**: Build a minimal playable version first (e.g., Learning Scenario with basic movement/combat).  
 2. **Iterate**: Test each system in isolation before combining.  
-3. **Expand**: Add advanced features (fire, special abilities) once core works.  
-
-Would you like me to elaborate on any specific task’s implementation steps?
+3. **Expand**: Add advanced features (fire, special abilities) once core works.
