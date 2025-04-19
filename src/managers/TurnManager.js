@@ -214,7 +214,16 @@ class TurnManager {
     if (this.currentPhase === 'monster') {
       // Reset monster movement points
       for (const monster of this.gameState.monsters.values()) {
-        monster.resetMovementPoints();
+        // Check if the monster has the resetMovementPoints method
+        if (typeof monster.resetMovementPoints === 'function') {
+          monster.resetMovementPoints();
+        } else {
+          // Fallback for placeholder monster objects
+          console.log('Monster does not have resetMovementPoints method - using fallback');
+          monster.currentMovementPoints = monster.strengths?.movement || 
+                                        monster.config?.movement || 
+                                        4; // Default movement value
+        }
       }
       
       // Other monster-specific turn start effects
@@ -222,7 +231,14 @@ class TurnManager {
     } else {
       // Reset human unit movement points
       for (const unit of this.gameState.units.values()) {
-        unit.resetMovementPoints();
+        // Check if the unit has the resetMovementPoints method
+        if (typeof unit.resetMovementPoints === 'function') {
+          unit.resetMovementPoints();
+        } else {
+          // Fallback for placeholder unit objects
+          console.log('Unit does not have resetMovementPoints method - using fallback');
+          unit.currentMovementPoints = unit.stats?.movement || 2; // Default movement value
+        }
       }
       
       // Other human-specific turn start effects

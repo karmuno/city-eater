@@ -5,8 +5,8 @@ import GameScene from './src/scenes/GameScene.js';
 const config = {
     type: Phaser.AUTO, // Auto-detect WebGL or Canvas
     parent: 'game-container', // ID of the HTML container
-    width: 1200, // Map width (adjust to match your tilemap)
-    height: 800, // Map height
+    width: 2400, // Map width (adjust to match your tilemap)
+    height: 1600, // Map height
     backgroundColor: '#2d2d2d',
     scene: [BootScene, MainMenuScene, GameScene], // Scene order matters!
     scale: {
