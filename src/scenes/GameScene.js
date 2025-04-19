@@ -1,21 +1,31 @@
 class GameScene extends Phaser.Scene {
-    constructor() {
-      super({ key: 'GameScene' });
-    }
-  
-    preload() {
-      console.log("GameScene loaded!");
-      // Load the map tileset image and the tilemap JSON
-      this.load.image('original-map', 'assets/images/board/original-map-upscaled.png');
-      this.load.tilemapTiledJSON('map', 'assets/tilemaps/sheboygan_map.json');
-    }
-  
-    create() {
-      // Create the tilemap and display the background layer
-      const map = this.make.tilemap({ key: 'map' });
-      const tileset = map.addTilesetImage('original-map', 'original-map');
-      const background = map.createLayer('Background', tileset, 0, 0);
-      
-      // TODO: Add additional layers, objects, and game logic here
-    }
+  constructor() {
+    super({ key: 'GameScene' });
   }
+  
+  preload() {
+    console.log("GameScene loaded!");
+    // Load just the map image directly
+    this.load.image('map-bg', 'assets/images/board/original-map-upscaled.png');
+  }
+  
+  create() {
+    // Add the map image as a background
+    const mapImage = this.add.image(0, 0, 'map-bg');
+    
+    // Set the origin to top-left corner (0,0)
+    mapImage.setOrigin(0, 0);
+    
+    // Optional: Adjust the scale if needed
+    // mapImage.setScale(0.8);
+    
+    // Optional: Center in the game world if needed
+    mapImage.setPosition(this.cameras.main.width / 2 - mapImage.width / 2,
+                        this.cameras.main.height / 2 - mapImage.height / 2);
+    
+    // Optional: Set up camera bounds to match the map size
+    this.cameras.main.setBounds(0, 0, mapImage.width, mapImage.height);
+    
+    console.log("Map background added!");
+  }
+}
