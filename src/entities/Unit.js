@@ -14,7 +14,9 @@ class Unit extends Phaser.GameObjects.Container {
     super(scene, x, y);
     
     this.type = type;
+    this.id = `unit-${Date.now()}-${Math.floor(Math.random() * 1000)}`; // Unique ID
     this.currentNodeId = nodeId;
+    this.faction = 'human';
     
     // Default stats
     this.stats = {

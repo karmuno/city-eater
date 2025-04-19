@@ -127,6 +127,20 @@ class GameState {
   }
   
   /**
+   * Alias for registerMonster for consistency with other methods
+   * @param {Monster} monster - The monster to add
+   */
+  addMonster(monster) {
+    this.registerMonster(monster);
+    
+    // Emit monster VP changed event for the dashboard
+    this.scene.events.emit('monster-vp-changed', {
+      monster: monster,
+      victoryPoints: monster.victoryPoints || 0
+    });
+  }
+  
+  /**
    * Register a marker (fire, rubble, web) with the game state
    * @param {Object} marker - The marker to register
    */

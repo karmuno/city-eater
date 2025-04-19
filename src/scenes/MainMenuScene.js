@@ -152,8 +152,8 @@ class MainMenuScene extends Phaser.Scene {
     // Store the selected scenario information
     this.registry.set('scenario', scenario);
     
-    // Start the game with the selected scenario
-    this.scene.start('GameScene');
+    // Start the setup process
+    this.scene.start('SetupScene');
   }
   
   showRulesModal() {
