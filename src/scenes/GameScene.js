@@ -131,7 +131,10 @@ class GameScene extends Phaser.Scene {
         console.log('All game data loaded successfully');
         
         // Load the map data
-        this.mapManager.loadMap('sheboygan-map');
+        this.mapManager.loadMap('sheboygan-map', 'mapNodes');
+        
+        // Always show movement nodes
+        this.mapManager.drawDebugNodes();
         
         // Draw debug visuals for terrain
         this.mapManager.drawDebugTerrain(true);
