@@ -17,6 +17,9 @@ class GameScene extends Phaser.Scene {
     // Load the Tiled map JSON
     this.load.json('sheboygan-map', 'assets/tilemaps/sheboygan_map.json');
     
+    // Load the nodes data JSON
+    this.load.json('map-nodes', 'assets/data/map-nodes.json');
+    
     // Preload a marker image for positions
     this.load.image('marker', 'assets/images/ui/loading-bar.png'); // Placeholder image
   }
@@ -58,34 +61,69 @@ class GameScene extends Phaser.Scene {
         return;
       }
       
-      console.log(`Clicked on ${terrainType} terrain. Movement cost: ${this.mapManager.getMovementCost(terrainType)}`);
+      // Find the nearest node to the clicked position
+      const nearestNode = this.mapManager.findNearestNode(pointer.x, pointer.y);
+      if (!nearestNode) {
+        console.log('No valid node found near click position');
+        return;
+      }
+      
+      const movementCost = this.mapManager.getMovementCost(terrainType);
+      console.log(`Clicked on ${terrainType} terrain. Movement cost: ${movementCost}`);
       
       // If this is the first click, set as selected position
       if (!this.selectedPosition) {
-        this.selectedPosition = { x: pointer.x, y: pointer.y };
-        this.mapManager.showMovementRange(this.selectedPosition, this.movementPoints);
+        this.selectedPosition = { 
+          x: pointer.x, 
+          y: pointer.y,
+          nodeId: nearestNode.id
+        };
+        // Show movement range using node ID
+        this.mapManager.showMovementRange(nearestNode.id, this.movementPoints);
         this.drawPositionMarker(this.selectedPosition, 0x0000FF);
-        console.log(`Selected starting position: (${this.selectedPosition.x}, ${this.selectedPosition.y})`);
+        console.log(`Selected starting position: (${this.selectedPosition.x}, ${this.selectedPosition.y}) at node ${nearestNode.id}`);
       } 
       // If this is the second click, try to find a path to the target
       else if (!this.targetPosition) {
-        this.targetPosition = { x: pointer.x, y: pointer.y };
+        this.targetPosition = { 
+          x: pointer.x, 
+          y: pointer.y,
+          nodeId: nearestNode.id
+        };
         this.drawPositionMarker(this.targetPosition, 0xFF0000);
-        console.log(`Selected target position: (${this.targetPosition.x}, ${this.targetPosition.y})`);
+        console.log(`Selected target position: (${this.targetPosition.x}, ${this.targetPosition.y}) at node ${nearestNode.id}`);
         
-        // Find path between the two points
-        const path = pathfinding.findPath(
-          this.selectedPosition, 
-          this.targetPosition, 
-          this.mapManager, 
-          this.movementPoints
-        );
-        
-        if (path.length > 0) {
-          console.log(`Found path with ${path.length} steps`);
-          this.drawPath(path);
-        } else {
-          console.log('No valid path found');
+        // Find path between node IDs
+        try {
+          // Debug adjacency to help troubleshoot pathfinding
+          this.debugPathBetweenNodes(
+            this.selectedPosition.nodeId,
+            this.targetPosition.nodeId
+          );
+          
+          const nodePath = this.mapManager.findPath(
+            this.selectedPosition.nodeId, 
+            this.targetPosition.nodeId
+          );
+          
+          if (nodePath.length > 0) {
+            console.log(`Found path with ${nodePath.length} nodes:`, nodePath);
+            
+            // Convert node IDs to positions for visualization
+            const path = nodePath.map(nodeId => {
+              const node = this.mapManager.nodes[nodeId];
+              return { x: node.x, y: node.y };
+            });
+            
+            this.drawPath(path);
+          } else {
+            console.log('No valid path found');
+            // Show an error message to the user
+            this.showNoPathMessage();
+          }
+        } catch (error) {
+          console.error("Error finding path:", error);
+          this.showNoPathMessage();
         }
       } 
       // Reset on third click
@@ -93,7 +131,7 @@ class GameScene extends Phaser.Scene {
         this.clearMarkers();
         this.selectedPosition = null;
         this.targetPosition = null;
-        this.mapManager.showMovementRange({x: pointer.x, y: pointer.y}, this.movementPoints);
+        this.mapManager.showMovementRange(nearestNode.id, this.movementPoints);
         console.log('Reset positions');
       }
     });
@@ -105,8 +143,8 @@ class GameScene extends Phaser.Scene {
       this.updateMovementDisplay();
       
       // Update movement range if we have a selected position
-      if (this.selectedPosition) {
-        this.mapManager.showMovementRange(this.selectedPosition, this.movementPoints);
+      if (this.selectedPosition && this.selectedPosition.nodeId) {
+        this.mapManager.showMovementRange(this.selectedPosition.nodeId, this.movementPoints);
       }
     });
     
@@ -116,8 +154,8 @@ class GameScene extends Phaser.Scene {
       this.updateMovementDisplay();
       
       // Update movement range if we have a selected position
-      if (this.selectedPosition) {
-        this.mapManager.showMovementRange(this.selectedPosition, this.movementPoints);
+      if (this.selectedPosition && this.selectedPosition.nodeId) {
+        this.mapManager.showMovementRange(this.selectedPosition.nodeId, this.movementPoints);
       }
     });
     
@@ -198,6 +236,86 @@ class GameScene extends Phaser.Scene {
     if (this.markerGraphics) {
       this.markerGraphics.clear();
     }
+    
+    // Clear any error messages
+    if (this.errorText) {
+      this.errorText.destroy();
+      this.errorText = null;
+    }
+  }
+  
+  /**
+   * Show an error message when no path can be found
+   */
+  showNoPathMessage() {
+    if (this.errorText) {
+      this.errorText.destroy();
+    }
+    
+    this.errorText = this.add.text(
+      this.cameras.main.width / 2,
+      100,
+      'No valid path between these nodes!',
+      {
+        fontSize: '20px',
+        fontStyle: 'bold',
+        fill: '#FF0000',
+        backgroundColor: '#00000088',
+        padding: { x: 10, y: 5 }
+      }
+    ).setOrigin(0.5, 0.5);
+    
+    this.errorText.setScrollFactor(0); // Fix to camera
+    
+    // Make the text fade out after a few seconds
+    this.tweens.add({
+      targets: this.errorText,
+      alpha: 0,
+      duration: 3000,
+      delay: 2000,
+      onComplete: () => {
+        if (this.errorText) {
+          this.errorText.destroy();
+          this.errorText = null;
+        }
+      }
+    });
+  }
+  
+  /**
+   * Debug utility to log adjacency information between nodes
+   * @param {number} startNodeId - Starting node ID
+   * @param {number} endNodeId - Target node ID
+   */
+  debugPathBetweenNodes(startNodeId, endNodeId) {
+    const startNode = this.mapManager.nodes[startNodeId];
+    const endNode = this.mapManager.nodes[endNodeId];
+    
+    if (!startNode || !endNode) {
+      console.error("Invalid nodes for debug:", startNodeId, endNodeId);
+      return;
+    }
+    
+    console.log("==== PATH DEBUG INFO ====");
+    console.log(`Start Node ${startNodeId}: (${startNode.x}, ${startNode.y}) - ${startNode.terrainType}`);
+    console.log(`Adjacent to: ${startNode.adjacentNodes.join(', ')}`);
+    console.log(`End Node ${endNodeId}: (${endNode.x}, ${endNode.y}) - ${endNode.terrainType}`);
+    console.log(`Adjacent to: ${endNode.adjacentNodes.join(', ')}`);
+    
+    // Try to find a path manually by checking common adjacencies
+    const startAdjSet = new Set(startNode.adjacentNodes);
+    const endAdjSet = new Set(endNode.adjacentNodes);
+    
+    // Find common adjacent nodes (potential intermediate steps)
+    const commonNodes = [...startAdjSet].filter(id => endAdjSet.has(id));
+    
+    if (commonNodes.length > 0) {
+      console.log(`Found common adjacent nodes: ${commonNodes.join(', ')}`);
+    } else {
+      console.log("No common adjacent nodes");
+    }
+    
+    console.log("=========================");
   }
 }
 

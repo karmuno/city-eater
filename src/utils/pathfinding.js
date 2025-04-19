@@ -80,8 +80,17 @@ function findPath(startPos, endPos, mapManager, maxCost = Infinity) {
       // Skip if in closed set
       if (closedSet.has(neighborKey)) continue;
       
-      // Calculate cost
-      const moveCost = mapManager.calculateMovementCost(current, neighbor);
+      // Calculate cost between positions
+      // First, we need to get the node IDs for these positions
+      const currentNode = mapManager.findNearestNode(current.x, current.y);
+      const neighborNode = mapManager.findNearestNode(neighbor.x, neighbor.y);
+      
+      if (!currentNode || !neighborNode) {
+        continue;
+      }
+      
+      // Use the node IDs to calculate movement cost
+      const moveCost = mapManager.calculateMovementCost(currentNode.id, neighborNode.id);
       
       // Skip impassable terrain
       if (moveCost < 0) continue;

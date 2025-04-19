@@ -128,7 +128,30 @@ class Unit extends Phaser.GameObjects.Container {
     const targetNode = this.scene.mapManager.nodes[targetNodeId];
     if (!targetNode) return false;
     
-    // Calculate path and movement cost
+    // Get all reachable nodes to check for special movement cases
+    const reachableNodes = this.scene.mapManager.findReachableNodes(
+      this.currentNodeId, 
+      this.currentMovementPoints, 
+      this
+    );
+    
+    // Find the target node in the reachable nodes
+    const targetInfo = reachableNodes.find(node => node.id === targetNodeId);
+    
+    // If target node is reachable via special movement
+    if (targetInfo && targetInfo.specialMovement) {
+      // Special movement cases handle direct movement without a path
+      console.log(`Using special movement '${targetInfo.specialMovement}' to node ${targetNodeId}`);
+      
+      // Create a direct path for visualization
+      const path = [this.currentNodeId, targetNodeId];
+      
+      // Always use all movement points for special movement
+      this.moveAlongPath(path, this.currentMovementPoints);
+      return true;
+    }
+    
+    // Normal pathfinding for standard movement
     const path = this.scene.mapManager.findPath(this.currentNodeId, targetNodeId, this);
     
     if (path.length === 0) {
@@ -140,11 +163,27 @@ class Unit extends Phaser.GameObjects.Container {
     let totalCost = 0;
     for (let i = 0; i < path.length - 1; i++) {
       const cost = this.scene.mapManager.calculateMovementCost(path[i], path[i + 1], this);
+      
+      // Handle Infinity cost as all movement points
+      if (cost === Infinity) {
+        totalCost = this.currentMovementPoints;
+        break;
+      }
+      
       totalCost += cost;
     }
     
     // Check if we have enough movement points
     if (totalCost > this.currentMovementPoints) {
+      // Check for rule 5.15 - If adjacent, can always move with all movement points
+      const currentNode = this.scene.mapManager.nodes[this.currentNodeId];
+      
+      if (currentNode.adjacentNodes.includes(targetNodeId)) {
+        console.log(`Using rule 5.15: Moving to adjacent node ${targetNodeId} by expending all movement points`);
+        this.moveAlongPath([this.currentNodeId, targetNodeId], this.currentMovementPoints);
+        return true;
+      }
+      
       console.log(`Not enough movement points (${this.currentMovementPoints}) to move to node ${targetNodeId} (cost: ${totalCost})`);
       return false;
     }
@@ -180,6 +219,33 @@ class Unit extends Phaser.GameObjects.Container {
       });
     }
     
+    // If this is an armor unit towing artillery, move the artillery along with it
+    if (this.type === 'armor' && this.towedArtillery) {
+      const artilleryTimeline = this.scene.tweens.createTimeline();
+      
+      // Add slightly delayed movement for artillery (visual effect of being towed)
+      for (let i = 1; i < coordinates.length; i++) {
+        artilleryTimeline.add({
+          targets: this.towedArtillery,
+          x: coordinates[i].x,
+          y: coordinates[i].y,
+          duration: 200,
+          ease: 'Linear',
+          delay: 50 // Slight delay to show it's being towed
+        });
+      }
+      
+      // Start the artillery movement timeline
+      artilleryTimeline.play();
+      
+      // Update artillery data after movement
+      artilleryTimeline.on('complete', () => {
+        // Update artillery's current node
+        this.towedArtillery.currentNodeId = path[path.length - 1];
+        console.log(`Artillery unit towed to node ${this.towedArtillery.currentNodeId}`);
+      });
+    }
+    
     // Start the timeline
     timeline.play();
     
@@ -198,9 +264,48 @@ class Unit extends Phaser.GameObjects.Container {
   
   /**
    * Reset movement points at start of turn
+   * Also handles the artillery towing mechanic
    */
   resetMovementPoints() {
+    // Check for towing mechanic (artillery being towed by armor)
+    if (this.type === 'artillery' && this.isTowed) {
+      // When towed, the artillery unit moves with its towing armor unit
+      // This is handled in the armor unit's movement logic
+      this.currentMovementPoints = 0;
+      return;
+    }
+    
+    // Check if we're an armor unit that can tow artillery
+    if (this.type === 'armor') {
+      // Find any artillery unit in the same node
+      const artillery = this.findArtilleryInSameNode();
+      
+      if (artillery) {
+        // If we have an artillery unit, we can tow it with a combined movement of 3
+        this.towedArtillery = artillery;
+        artillery.isTowed = true;
+        this.currentMovementPoints = 3; // Combined movement allowance of 3 when towing
+        console.log(`Armor unit towing artillery at node ${this.currentNodeId}`);
+        return;
+      } else {
+        this.towedArtillery = null;
+      }
+    }
+    
+    // Normal case: reset to the unit's standard movement points
     this.currentMovementPoints = this.stats.movementPoints;
+  }
+  
+  /**
+   * Find artillery units in the same node (for towing mechanic)
+   * @returns {Unit|null} Artillery unit to tow, or null if none found
+   */
+  findArtilleryInSameNode() {
+    // This is a placeholder - in a real implementation,
+    // we would query the scene's unitManager or similar to find units at this node
+    
+    // For now, let's assume there's no artillery unit
+    return null;
   }
   
   /**
