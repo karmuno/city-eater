@@ -1,0 +1,58 @@
+{
+  "infantry": {
+    "attack": 3,
+    "defense": 4,
+    "movement": 2,
+    "specialAbilities": [],
+    "description": "Basic human military unit. Medium strength but slow."
+  },
+  "police": {
+    "attack": 2,
+    "defense": 3,
+    "movement": 2,
+    "specialAbilities": [],
+    "description": "Law enforcement unit. Weaker than infantry but available in greater numbers."
+  },
+  "artillery": {
+    "attack": 6,
+    "defense": 2,
+    "movement": 1,
+    "specialAbilities": ["rangedAttack"],
+    "description": "Long-range attack unit. Powerful but vulnerable and slow."
+  },
+  "tank": {
+    "attack": 8,
+    "defense": 6,
+    "movement": 3,
+    "specialAbilities": [],
+    "description": "Heavy military vehicle. High strength and decent mobility."
+  },
+  "helicopter": {
+    "attack": 5,
+    "defense": 3,
+    "movement": 5,
+    "specialAbilities": ["flying", "ignoreTerrainCosts"],
+    "description": "Aerial unit. High mobility and can bypass obstacles."
+  },
+  "populace": {
+    "attack": 1,
+    "defense": 1,
+    "movement": 1,
+    "specialAbilities": [],
+    "description": "Civilian population. Very weak but worth protecting."
+  },
+  "firemen": {
+    "attack": 1,
+    "defense": 2,
+    "movement": 2,
+    "specialAbilities": ["extinguishFire"],
+    "description": "Fire control unit. Can extinguish fires in adjacent nodes."
+  },
+  "fireboat": {
+    "attack": 2,
+    "defense": 3,
+    "movement": 4,
+    "specialAbilities": ["extinguishFire", "waterOnly"],
+    "description": "Waterborne fire control unit. Faster movement in water and more effective at extinguishing fires."
+  }
+}

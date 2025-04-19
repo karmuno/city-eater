@@ -1,0 +1,166 @@
+[
+  {
+    "id": "learning",
+    "name": "Learning Scenario",
+    "description": "A simplified scenario designed to teach the basic game mechanics. The monster has balanced stats and a single special ability.",
+    "monsterConfig": {
+      "attack": 5,
+      "defense": 10,
+      "buildingDestruction": 3,
+      "movement": 4,
+      "variant": "a",
+      "specialAbilities": ["flying"]
+    },
+    "units": [
+      {
+        "type": "infantry",
+        "nodeId": 5,
+        "quantity": 1
+      },
+      {
+        "type": "police",
+        "nodeId": 8,
+        "quantity": 2
+      },
+      {
+        "type": "tank",
+        "nodeId": 12,
+        "quantity": 1
+      },
+      {
+        "type": "populace",
+        "nodeId": 15,
+        "quantity": 3
+      }
+    ],
+    "victoryConditions": {
+      "monsterVP": 80,
+      "humanVP": 50,
+      "maxTurns": 10
+    },
+    "windDirection": 1
+  },
+  {
+    "id": "cityEating",
+    "name": "City Eater",
+    "description": "Monster gains strength by destroying buildings. The monster's goal is to eat as much of the city as possible while facing increasing military opposition.",
+    "monsterConfig": {
+      "attack": 4,
+      "defense": 8,
+      "buildingDestruction": 4,
+      "movement": 3,
+      "variant": "c",
+      "specialAbilities": ["fireBreathing"]
+    },
+    "units": [
+      {
+        "type": "infantry",
+        "nodeId": 5,
+        "quantity": 2
+      },
+      {
+        "type": "police",
+        "nodeId": 8,
+        "quantity": 3
+      },
+      {
+        "type": "tank",
+        "nodeId": 12,
+        "quantity": 1
+      },
+      {
+        "type": "helicopter",
+        "nodeId": 20,
+        "quantity": 1
+      },
+      {
+        "type": "populace",
+        "nodeId": 15,
+        "quantity": 4
+      },
+      {
+        "type": "firemen",
+        "nodeId": 18,
+        "quantity": 2
+      }
+    ],
+    "victoryConditions": {
+      "monsterVP": 120,
+      "humanVP": 60,
+      "maxTurns": 15
+    },
+    "windDirection": 3,
+    "reinforcements": {
+      "turn3": [
+        {
+          "type": "artillery",
+          "nodeId": 25,
+          "quantity": 1
+        }
+      ],
+      "turn5": [
+        {
+          "type": "tank",
+          "nodeId": 30,
+          "quantity": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "gigantis",
+    "name": "Gigantis",
+    "description": "A giant monster with incredible destructive power but slow movement. Can crush buildings with ease but is vulnerable to military attacks.",
+    "monsterConfig": {
+      "attack": 8,
+      "defense": 12,
+      "buildingDestruction": 6,
+      "movement": 2,
+      "variant": "e",
+      "specialAbilities": ["greatHeight"]
+    },
+    "units": [
+      {
+        "type": "infantry",
+        "nodeId": 5,
+        "quantity": 3
+      },
+      {
+        "type": "police",
+        "nodeId": 8,
+        "quantity": 2
+      },
+      {
+        "type": "tank",
+        "nodeId": 12,
+        "quantity": 2
+      },
+      {
+        "type": "helicopter",
+        "nodeId": 20,
+        "quantity": 2
+      },
+      {
+        "type": "artillery",
+        "nodeId": 25,
+        "quantity": 1
+      },
+      {
+        "type": "populace",
+        "nodeId": 15,
+        "quantity": 3
+      },
+      {
+        "type": "firemen",
+        "nodeId": 18,
+        "quantity": 1
+      }
+    ],
+    "victoryConditions": {
+      "monsterVP": 150,
+      "humanVP": 70,
+      "maxTurns": 12
+    },
+    "windDirection": 2
+  }
+]

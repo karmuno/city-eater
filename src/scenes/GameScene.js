@@ -1,4 +1,8 @@
 import MapManager from '../managers/MapManager.js';
+import GameState from '../managers/GameState.js';
+import TurnManager from '../managers/TurnManager.js';
+import DataManager from '../managers/DataManager.js';
+import CombatManager from '../managers/CombatManager.js';
 import * as pathfinding from '../utils/pathfinding.js';
 
 class GameScene extends Phaser.Scene {
@@ -7,21 +11,48 @@ class GameScene extends Phaser.Scene {
     this.selectedPosition = null;
     this.targetPosition = null;
     this.movementPoints = 5; // Default movement points
+    this.selectedUnit = null;
+    this.selectedMonster = null;
+  }
+  
+  init(data) {
+    // Store the selected scenario if provided
+    this.scenarioId = data.scenarioId || 'learning';
   }
   
   preload() {
     console.log("GameScene loaded!");
     // Load the map image as a background
-    this.load.image('map-bg', 'assets/images/board/original-map-upscaled.png');
+    this.load.image('map-bg', 'assets/images/board/original-map.png');
     
     // Load the Tiled map JSON
     this.load.json('sheboygan-map', 'assets/tilemaps/sheboygan_map.json');
     
-    // Load the nodes data JSON
-    this.load.json('map-nodes', 'assets/data/map-nodes.json');
-    
     // Preload a marker image for positions
     this.load.image('marker', 'assets/images/ui/loading-bar.png'); // Placeholder image
+    
+    // Preload unit and monster sprites
+    this.load.image('infantry', 'assets/images/units/infantry.png');
+    this.load.image('police', 'assets/images/units/police.png');
+    this.load.image('tank', 'assets/images/units/tank.png');
+    this.load.image('helicopter', 'assets/images/units/helicopter.png');
+    this.load.image('populace', 'assets/images/units/populace.png');
+    this.load.image('firemen', 'assets/images/units/firemen.png');
+    this.load.image('fireboat', 'assets/images/units/fireboat.png');
+    this.load.image('artillery', 'assets/images/units/artillery.png');
+    
+    // Preload monster sprites
+    this.load.image('creature_a', 'assets/images/units/creature_a.png');
+    this.load.image('creature_b', 'assets/images/units/creature_b.png');
+    this.load.image('creature_c', 'assets/images/units/creature_c.png');
+    this.load.image('creature_d', 'assets/images/units/creature_d.png');
+    this.load.image('creature_e', 'assets/images/units/creature_e.png');
+    this.load.image('creature_f', 'assets/images/units/creature_f.png');
+    
+    // Preload marker sprites
+    this.load.image('fire', 'assets/images/markers/fire.png');
+    this.load.image('rubble', 'assets/images/markers/rubble.png');
+    this.load.image('web', 'assets/images/markers/web.png');
   }
   
   create() {
@@ -40,18 +71,150 @@ class GameScene extends Phaser.Scene {
     
     console.log("Map background added!");
     
+    // Initialize the data manager first as other systems depend on it
+    this.dataManager = new DataManager(this);
+    
+    // Initialize the game state manager
+    this.gameState = new GameState(this);
+    
     // Initialize the map manager
     this.mapManager = new MapManager(this);
     
-    // Load the map data
-    this.mapManager.loadMap('sheboygan-map');
+    // Initialize the turn manager
+    this.turnManager = new TurnManager(this, this.gameState);
     
-    // Draw debug visuals for terrain
-    this.mapManager.drawDebugTerrain(true);
+    // Initialize the combat manager
+    this.combatManager = new CombatManager(this, this.gameState, this.dataManager);
     
     // Initialize marker graphics
     this.markerGraphics = this.add.graphics();
     
+    // Load game data
+    this.loadGameData();
+    
+    // Add click handler for map interaction
+    this.setupInputHandlers();
+    
+    // Add UI elements
+    this.createUI();
+  }
+  
+  /**
+   * Load all game data using the data manager
+   */
+  loadGameData() {
+    // Show loading message
+    const loadingText = this.add.text(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2,
+      'Loading game data...',
+      {
+        fontSize: '24px',
+        fontStyle: 'bold',
+        fill: '#FFF',
+        backgroundColor: '#00000088',
+        padding: { x: 10, y: 5 }
+      }
+    ).setOrigin(0.5, 0.5).setScrollFactor(0);
+    
+    // Start loading all data
+    this.dataManager.loadAll()
+      .then(() => {
+        console.log('All game data loaded successfully');
+        
+        // Load the map data
+        this.mapManager.loadMap('sheboygan-map');
+        
+        // Draw debug visuals for terrain
+        this.mapManager.drawDebugTerrain(true);
+        
+        // Setup the game based on selected scenario
+        this.setupGame(this.scenarioId);
+        
+        // Remove loading text
+        loadingText.destroy();
+      })
+      .catch(error => {
+        console.error('Error loading game data:', error);
+        loadingText.setText('Error loading game data. Check console for details.');
+      });
+  }
+  
+  /**
+   * Set up the game based on the selected scenario
+   * @param {string} scenarioId - ID of the scenario to set up
+   */
+  setupGame(scenarioId) {
+    console.log(`Setting up game with scenario: ${scenarioId}`);
+    
+    // Get scenario data
+    const scenario = this.dataManager.getScenario(scenarioId);
+    
+    if (!scenario) {
+      console.error(`Scenario ${scenarioId} not found`);
+      return;
+    }
+    
+    // Store current scenario
+    this.scenario = scenario;
+    
+    // Create the monster
+    // TODO: Move this to a proper monster creation method
+    this.createMonster(scenario.monsterConfig);
+    
+    // Create units based on scenario
+    // TODO: Move this to a proper unit creation method
+    this.createUnits(scenario.units);
+    
+    // Start the game
+    this.turnManager.startGame();
+  }
+  
+  /**
+   * Create the monster based on scenario configuration
+   * @param {Object} monsterConfig - Configuration for the monster
+   */
+  createMonster(monsterConfig) {
+    // Placeholder implementation
+    console.log('Would create monster with config:', monsterConfig);
+    
+    // TODO: Implement actual monster creation with Monster class
+    // For now, we'll just emit an event for testing
+    this.events.emit('monster-created', {
+      id: 'monster-1',
+      type: 'monster',
+      currentNodeId: 1, // Starting node ID
+      config: monsterConfig
+    });
+  }
+  
+  /**
+   * Create units based on scenario configuration
+   * @param {Array} units - Array of unit configurations
+   */
+  createUnits(units) {
+    // Placeholder implementation
+    console.log('Would create units:', units);
+    
+    // TODO: Implement actual unit creation with Unit class
+    // For now, we'll just emit an event for testing
+    if (units && units.length > 0) {
+      units.forEach((unit, index) => {
+        this.events.emit('unit-created', {
+          id: `unit-${index}`,
+          type: unit.type,
+          currentNodeId: unit.nodeId,
+          faction: 'human',
+          stats: this.dataManager.getUnitStats(unit.type)
+        });
+      });
+    }
+  }
+  
+  /**
+   * Set up input handlers for map interaction
+   */
+  setupInputHandlers() {
     // Add a click handler to show movement range and handle path selection
     this.input.on('pointerdown', (pointer) => {
       const terrainType = this.mapManager.getTerrainTypeAtPosition(pointer.x, pointer.y);
@@ -68,6 +231,27 @@ class GameScene extends Phaser.Scene {
         return;
       }
       
+      // If we're in a game state where we need to select units, check for units at this node
+      const units = this.gameState.getUnitsAtNode(nearestNode.id);
+      const monsters = this.gameState.getMonstersAtNode(nearestNode.id);
+      
+      // Basic unit selection logic - will be expanded based on turn phase
+      if (units.length > 0 && this.turnManager.currentPhase === 'human') {
+        // Select a human unit
+        this.selectUnit(units[0]);
+      } else if (monsters.length > 0 && this.turnManager.currentPhase === 'monster') {
+        // Select the monster
+        this.selectMonster(monsters[0]);
+      } else if (this.selectedUnit || this.selectedMonster) {
+        // If we have a selected unit already, try to move it
+        if (this.selectedUnit && this.turnManager.currentPhase === 'human') {
+          this.moveSelectedUnit(nearestNode.id);
+        } else if (this.selectedMonster && this.turnManager.currentPhase === 'monster') {
+          this.moveSelectedMonster(nearestNode.id);
+        }
+      }
+      
+      // Legacy pathfinding demo code
       const movementCost = this.mapManager.getMovementCost(terrainType);
       console.log(`Clicked on ${terrainType} terrain. Movement cost: ${movementCost}`);
       
@@ -159,6 +343,23 @@ class GameScene extends Phaser.Scene {
       }
     });
     
+    // Add keyboard control for ending turn
+    this.input.keyboard.on('keydown-E', () => {
+      console.log('End turn key pressed');
+      this.turnManager.endCurrentTurn();
+    });
+    
+    // Add keyboard control for ending phase
+    this.input.keyboard.on('keydown-P', () => {
+      console.log('End phase key pressed');
+      this.turnManager.endCurrentSubPhase();
+    });
+  }
+  
+  /**
+   * Create UI elements for the game scene
+   */
+  createUI() {
     // Add text to display current movement points
     this.movementText = this.add.text(20, 20, `Movement Points: ${this.movementPoints}`, {
       fontSize: '24px',
@@ -169,13 +370,28 @@ class GameScene extends Phaser.Scene {
     });
     this.movementText.setScrollFactor(0); // Fix to camera
     
+    // Add text to display current turn state
+    this.turnText = this.add.text(
+      this.cameras.main.width / 2,
+      20,
+      'TURN 1: MONSTER PLAYER',
+      {
+        fontSize: '24px',
+        fontStyle: 'bold',
+        fill: '#FFF',
+        backgroundColor: '#00000088',
+        padding: { x: 10, y: 5 }
+      }
+    ).setOrigin(0.5, 0).setScrollFactor(0);
+    
     // Add instructions
     this.instructionsText = this.add.text(20, 60, 
       'Instructions:\n' +
       '- Click to select a starting position\n' +
       '- Click again to select a target position\n' +
       '- Third click resets the selections\n' +
-      '- Up/Down arrows change movement points', 
+      '- Up/Down arrows change movement points\n' +
+      '- E key ends turn, P key ends phase', 
       {
         fontSize: '16px',
         fill: '#FFF',
@@ -184,6 +400,158 @@ class GameScene extends Phaser.Scene {
       }
     );
     this.instructionsText.setScrollFactor(0); // Fix to camera
+    
+    // Update turn display when turn changes
+    this.events.on('turn-changed', this.updateTurnDisplay, this);
+    this.events.on('sub-phase-changed', this.updateTurnDisplay, this);
+  }
+  
+  /**
+   * Update the turn display with current turn information
+   */
+  updateTurnDisplay() {
+    if (this.turnText) {
+      this.turnText.setText(this.turnManager.getTurnStateText());
+      
+      // Change color based on current player
+      const textColor = this.turnManager.currentPhase === 'monster' ? '#FF0000' : '#00FF00';
+      this.turnText.setColor(textColor);
+    }
+  }
+  
+  /**
+   * Select a unit for movement/combat
+   * @param {Unit} unit - The unit to select
+   */
+  selectUnit(unit) {
+    // Clear any previous selection
+    this.clearSelection();
+    
+    // Store the selected unit
+    this.selectedUnit = unit;
+    
+    console.log(`Selected unit ${unit.type} (ID: ${unit.id})`);
+    
+    // Show movement range for selected unit
+    if (this.turnManager.currentSubPhase === 'movement') {
+      this.mapManager.showMovementRange(
+        unit.currentNodeId,
+        unit.currentMovementPoints || 0,
+        unit
+      );
+    }
+    
+    // Emit unit selected event
+    this.events.emit('unit-selected', unit);
+  }
+  
+  /**
+   * Select the monster for movement/combat/abilities
+   * @param {Monster} monster - The monster to select
+   */
+  selectMonster(monster) {
+    // Clear any previous selection
+    this.clearSelection();
+    
+    // Store the selected monster
+    this.selectedMonster = monster;
+    
+    console.log(`Selected monster (ID: ${monster.id})`);
+    
+    // Show movement range for selected monster
+    if (this.turnManager.currentSubPhase === 'movement') {
+      this.mapManager.showMovementRange(
+        monster.currentNodeId,
+        monster.currentMovementPoints || 0,
+        monster
+      );
+    }
+    
+    // Emit monster selected event
+    this.events.emit('monster-selected', monster);
+  }
+  
+  /**
+   * Clear the current unit/monster selection
+   */
+  clearSelection() {
+    this.selectedUnit = null;
+    this.selectedMonster = null;
+    
+    // Clear movement range display
+    if (this.mapManager.rangeGraphics) {
+      this.mapManager.rangeGraphics.clear();
+    }
+  }
+  
+  /**
+   * Move the selected unit to a target node
+   * @param {number} targetNodeId - ID of the target node
+   */
+  moveSelectedUnit(targetNodeId) {
+    if (!this.selectedUnit) return;
+    
+    if (this.turnManager.currentSubPhase !== 'movement') {
+      console.log(`Cannot move during ${this.turnManager.currentSubPhase} phase`);
+      return;
+    }
+    
+    // Check if the unit can move
+    if (this.selectedUnit.currentMovementPoints <= 0) {
+      console.log('Unit has no movement points remaining');
+      return;
+    }
+    
+    // TODO: Implement actual unit movement
+    console.log(`Would move unit ${this.selectedUnit.id} to node ${targetNodeId}`);
+    
+    // Emit movement completed event
+    this.events.emit('movement-completed');
+  }
+  
+  /**
+   * Move the selected monster to a target node
+   * @param {number} targetNodeId - ID of the target node
+   */
+  moveSelectedMonster(targetNodeId) {
+    if (!this.selectedMonster) return;
+    
+    if (this.turnManager.currentSubPhase !== 'movement') {
+      console.log(`Cannot move during ${this.turnManager.currentSubPhase} phase`);
+      return;
+    }
+    
+    // Check if the monster can move
+    if (this.selectedMonster.currentMovementPoints <= 0) {
+      console.log('Monster has no movement points remaining');
+      return;
+    }
+    
+    // TODO: Implement actual monster movement
+    console.log(`Would move monster ${this.selectedMonster.id} to node ${targetNodeId}`);
+    
+    // Emit movement completed event
+    this.events.emit('movement-completed');
+  }
+  
+  /**
+   * Initiate combat between attacker and defender
+   * @param {Unit|Monster} attacker - The attacking unit
+   * @param {Unit|Monster} defender - The defending unit
+   */
+  initiateCombat(attacker, defender) {
+    if (this.turnManager.currentSubPhase !== 'combat') {
+      console.log(`Cannot initiate combat during ${this.turnManager.currentSubPhase} phase`);
+      return;
+    }
+    
+    console.log(`Initiating combat between ${attacker.constructor.name} and ${defender.constructor.name}`);
+    
+    // Emit combat initiated event
+    this.events.emit('combat-initiated', {
+      attacker: attacker,
+      defender: defender
+    });
   }
   
   /**

@@ -1,0 +1,21 @@
+{
+  "odds": ["-3", "-2", "-1", "1", "2", "3", "4", "5"],
+  "results": [
+    ["AE", "AE", "AE", "DR", "DR", "DE", "DE", "DE"],
+    ["AE", "AE", "AR", "DR", "NE", "DR", "DE", "DE"],
+    ["AE", "AR", "AR", "NE", "DR", "DR", "DE", "DE"],
+    ["AR", "AR", "NE", "NE", "DR", "DR", "DE", "DE"],
+    ["NE", "NE", "AD", "AD", "DD", "DR", "DE", "DE"],
+    ["AD", "AD", "DD", "DD", "DD", "EX", "DE", "DE"]
+  ],
+  "legend": {
+    "DE": "Defender Eliminated",
+    "DR": "Defender Retreats",
+    "DD": "Defender Damaged",
+    "NE": "No Effect",
+    "AD": "Attacker Damaged",
+    "AR": "Attacker Retreats",
+    "AE": "Attacker Eliminated",
+    "EX": "Exchange (Both Eliminated)"
+  }
+}

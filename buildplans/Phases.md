@@ -1,7 +1,7 @@
 ### Next 3 Steps:
-1. **Complete Monster Class Implementation** - Finish Monster.js with customizable strengths and movement mechanics
-2. **Data Loading System** - Load combat tables and unit stats from JSON files
-3. **Combat System** - Calculate odds ratios and implement combat resolution
+1. **Fire Mechanics Implementation** - Add FireMarker.js class and fire spread mechanics
+2. **UI Development** - Implement TurnIndicator and UnitPanel components
+3. **Monster Dashboard** - Complete the MonsterDashboard UI for strength management
 
 Here's a prioritized breakdown of build tasks for the game, ordered for logical progression:
 
@@ -34,11 +34,11 @@ Here's a prioritized breakdown of build tasks for the game, ordered for logical 
    - Add stats (combat strength, movement allowance)  
    - Load unit sprites from `/assets/images/units/`  
 
-6. **Monster Class**  
+6. **Monster Class** ✓
    - Build `Monster.js` with customizable strengths  
    - Implement special ability placeholder system  
 
-7. **Game State Management**
+7. **Game State Management** ✓
    - Create `GameState.js` to track game state
    - Implement unit tracking and position management
    - Add state serialization for save/load capability
@@ -47,12 +47,12 @@ Here's a prioritized breakdown of build tasks for the game, ordered for logical 
 ---
 
 ### **Phase 3: Core Mechanics**  
-8. **Data Loading**
+8. **Data Loading** ✓
    - Load combat tables from JSON
    - Load unit stats and special abilities
    - Create data validation and error handling
 
-9. **Turn System**  
+9. **Turn System** ✓
    - Alternate between Monster/Human turns  
    - Track movement points and actions per turn  
    - Implement action limits (3 destruction attempts)
@@ -62,7 +62,7 @@ Here's a prioritized breakdown of build tasks for the game, ordered for logical 
    - Implement pathfinding with terrain costs
    - Add terrain restrictions (e.g., helicopters ignore rivers)  
 
-11. **Combat System**  
+11. **Combat System** ✓
    - Calculate odds ratios (attacker/defender strength)  
    - Integrate virtual die roll (1–6)  
    - Apply results from `combat-tables.json`  
