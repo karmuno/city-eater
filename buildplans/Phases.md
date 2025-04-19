@@ -1,7 +1,7 @@
 ### Next 3 Steps:
-1. **Implement Monster Class** - Create Monster.js with customizable strengths and basic movement mechanics
-2. **Build Game State Management** - Develop GameState.js to track unit positions, health, and game conditions
-3. **Implement Turn Manager** - Create turn alternation between monster and human players
+1. **Complete Monster Class Implementation** - Finish Monster.js with customizable strengths and movement mechanics
+2. **Data Loading System** - Load combat tables and unit stats from JSON files
+3. **Combat System** - Calculate odds ratios and implement combat resolution
 
 Here's a prioritized breakdown of build tasks for the game, ordered for logical progression:
 
